@@ -34,6 +34,10 @@ def sanitizeDataset(dataDir: str, settings: 'dict[str, any]') -> None:
     df[['year', 'month']] = df['ym'].str.split('M', n=1, expand=True)
     df = df.drop(['ym'], axis=1)
 
+    df['year'] = pd.to_numeric(df['year'], downcast='integer')
+    df['cpi'] = pd.to_numeric(df['cpi'], downcast='float')
+    df['month'] = pd.to_numeric(df['month'], downcast='integer')
+
     # save to disk in pickle for better performance
     pd.to_pickle(df, f'{dataDir}/{countryName}.pkl')
 
