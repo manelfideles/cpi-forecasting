@@ -27,13 +27,12 @@ def sanitizeDataset(dataDir: str, settings: 'dict[str, any]') -> None:
     df: pd.DataFrame = df \
         .loc[:, df.columns.str.startswith(relevantCols)] \
         .transpose() \
-        .rename(columns={8222: 'cpi'}) \
         .reset_index() \
         .rename(columns={'index': 'ym'})
 
     df[['year', 'month']] = df['ym'].str.split('M', n=1, expand=True)
     df = df.drop(['ym'], axis=1)
-
+    df = df.rename(columns={df.columns[0]: 'cpi'})
     df['year'] = pd.to_numeric(df['year'], downcast='integer')
     df['cpi'] = pd.to_numeric(df['cpi'], downcast='float')
     df['month'] = pd.to_numeric(df['month'], downcast='integer')
@@ -51,3 +50,20 @@ def getDataset(dataDir: str, settings: 'dict[str, any]') -> pd.DataFrame:
     )
     print('Done!')
     return df
+
+
+if __name__ == '__main__':
+    dataDir: str = '../../data'
+    countryName = 'United Kingdom'
+
+    settings: 'dict[str, any]' = {
+        'filePath': getDatasetFilePath(
+            dataDir,
+            countryName,
+            fallback='CPITimeSeries'
+        ),
+        'countryName': countryName,
+        'indicator': 'PCPI_IX',
+    }
+
+    df = getDataset(dataDir, settings)
